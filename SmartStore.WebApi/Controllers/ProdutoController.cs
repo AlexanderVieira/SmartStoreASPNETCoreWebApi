@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 using SmartStore.Domain.Intefaces;
 using SmartStore.Domain.Entities;
+using Microsoft.AspNetCore.Cors;
 
 namespace SmartStore.WebApi.Controllers
 {
@@ -27,6 +28,7 @@ namespace SmartStore.WebApi.Controllers
         }
 
         [HttpGet]
+        //[EnableCors("AllowOrigin")]
         public IActionResult Get()
         {
             try

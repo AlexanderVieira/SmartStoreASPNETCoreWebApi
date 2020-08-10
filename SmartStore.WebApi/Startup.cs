@@ -47,6 +47,12 @@ namespace SmartStore.WebApi
                                                         .UseMySql(connectionString,
                                                                             m => m.MigrationsAssembly("SmartStore.Infra")));
 
+            //### CORS POLICY ###
+            services.AddCors(c =>
+            {
+                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
+            });
+
             services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
             services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
             services.AddScoped<IPedidoRepositorio, PedidoRepositorio>();
@@ -85,6 +91,7 @@ namespace SmartStore.WebApi
                 x.SwaggerEndpoint("/swagger/v1/swagger.json", "Smart Store V1");
             });
 
+            app.UseCors("AllowOrigin");
             app.UseMvc();
 
             //app.UseSpaStaticFiles(); 
