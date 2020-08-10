@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SmartStore.Domain.Enumerateds
+﻿namespace SmartStore.Domain.Enumerateds
 {
     public enum TipoFormaPagamentoEnum
     {

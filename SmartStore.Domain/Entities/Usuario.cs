@@ -21,10 +21,10 @@ namespace SmartStore.Domain.Entities
         public override void Validate()
         {
             if (string.IsNullOrEmpty(Email))
-                AdicionarCritica("Email não foi informado");
+                AdicionarCritica("Email não informado.");
 
             if (string.IsNullOrEmpty(Senha))
-                AdicionarCritica("Senha não foi informado");
+                AdicionarCritica("Senha não informada.");
         }
     }
 }

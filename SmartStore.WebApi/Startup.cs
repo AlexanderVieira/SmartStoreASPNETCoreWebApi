@@ -45,11 +45,16 @@ namespace SmartStore.WebApi
             services.AddDbContext<SmartStoreDbContext>(option =>
                                                         option.UseLazyLoadingProxies()
                                                         .UseMySql(connectionString,
-                                                                            m => m.MigrationsAssembly("QuickBuy.Repositorio")));
+                                                                            m => m.MigrationsAssembly("SmartStore.Infra")));
 
             services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
             services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
             services.AddScoped<IPedidoRepositorio, PedidoRepositorio>();
+
+            services.AddSwaggerGen(x =>
+            {
+                x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Smart Store", Version = "v1" });
+            });
 
             // In production, the Angular files will be served from this directory
             //services.AddSpaStaticFiles(configuration =>
@@ -73,8 +78,15 @@ namespace SmartStore.WebApi
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(x =>
+            {
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "Smart Store V1");
+            });
+
             app.UseMvc();
-            
+
             //app.UseSpaStaticFiles(); 
             //app.UseSpa(spa =>
             //{

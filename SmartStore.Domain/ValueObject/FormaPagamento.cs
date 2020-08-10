@@ -1,7 +1,4 @@
 ﻿using SmartStore.Domain.Enumerateds;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SmartStore.Domain.ValueObject
 {
