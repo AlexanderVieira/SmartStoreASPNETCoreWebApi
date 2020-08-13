@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SmartStore.Domain.Entities
+﻿namespace SmartStore.Domain.Entities
 {
     public class ItemPedido : Validacao
     {
@@ -16,7 +12,7 @@ namespace SmartStore.Domain.Entities
                 AdicionarCritica("Não foi identificado qual a referência do produto");
 
             if (Quantidade == 0)
-                AdicionarCritica("Quantidade não foi informado");
+                AdicionarCritica("Quantidade não foi informada");
         }
     }
 }

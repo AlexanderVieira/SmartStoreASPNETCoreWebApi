@@ -11,6 +11,11 @@ namespace SmartStore.Infra.Config
             builder.HasKey(p => p.Id);
 
             builder
+                .Property(p => p.TagRFID)
+                .IsRequired()
+                .HasMaxLength(12);
+
+            builder
                 .Property(p => p.Nome)
                 .IsRequired()
                 .HasMaxLength(50);

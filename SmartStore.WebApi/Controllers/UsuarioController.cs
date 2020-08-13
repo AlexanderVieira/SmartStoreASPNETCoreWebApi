@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using SmartStore.Domain.Entities;
 using SmartStore.Domain.Intefaces;
@@ -16,7 +17,7 @@ namespace SmartStore.WebApi.Controllers
             _usuarioRepositorio = usuarioRepositorio;
         }
 
-        [HttpGet]
+        [HttpGet]        
         public ActionResult Get()
         {
             try
@@ -29,7 +30,7 @@ namespace SmartStore.WebApi.Controllers
             }
         }
 
-        [HttpPost("VerificarUsuario")]
+        [HttpPost("VerificarUsuario")]        
         public ActionResult VerificarUsuario([FromBody] Usuario usuario)
         {
             try
@@ -47,7 +48,7 @@ namespace SmartStore.WebApi.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost]        
         public ActionResult Post([FromBody] Usuario usuario)
         {
             try

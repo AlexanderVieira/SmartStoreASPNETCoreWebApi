@@ -27,8 +27,7 @@ namespace SmartStore.WebApi.Controllers
             _hostEnvironment = hostEnvironment;
         }
 
-        [HttpGet]
-        //[EnableCors("AllowOrigin")]
+        [HttpGet]        
         public IActionResult Get()
         {
             try
@@ -56,10 +55,12 @@ namespace SmartStore.WebApi.Controllers
                 }
                 if (produto.Id > 0)
                 {
+                    //produto.TagRFID.ToUpper().Trim();
                     _produtoRepositorio.Atualizar(produto);
                 }
                 else
                 {
+                    //produto.TagRFID.ToUpper().Trim();
                     _produtoRepositorio.Adicionar(produto);
                 }
 

@@ -19,6 +19,8 @@ namespace SmartStore.Infra.Context
         public SmartStoreDbContext(DbContextOptions<SmartStoreDbContext> options) : base(options)
         {
             //Database.EnsureCreated();
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            ChangeTracker.AutoDetectChangesEnabled = false;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

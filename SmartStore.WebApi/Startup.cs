@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SmartStore.Domain.Intefaces;
 using SmartStore.Infra.Context;
 using SmartStore.Infra.Repositories;
+using SmartStore.WebApi.Services;
 using System.IO;
 
 namespace SmartStore.WebApi
@@ -16,18 +17,10 @@ namespace SmartStore.WebApi
     {
         public Startup(IHostingEnvironment env)
         {
-            //var builder = new ConfigurationBuilder();
-            //builder.AddJsonFile("config.json", optional: false, reloadOnChange: true);
-
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            //if (env.IsDevelopment())
-            //{
-            //    builder.AddUserSecrets<Startup>();
-            //}
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);            
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
@@ -43,16 +36,20 @@ namespace SmartStore.WebApi
 
             var connectionString = Configuration.GetConnectionString("MySqlConnection");
             services.AddDbContext<SmartStoreDbContext>(option =>
-                                                        option.UseLazyLoadingProxies()
-                                                        .UseMySql(connectionString,
-                                                                            m => m.MigrationsAssembly("SmartStore.Infra")));
-
-            //### CORS POLICY ###
-            services.AddCors(c =>
+                                                        option.UseMySql(connectionString,
+                                                        m => m.MigrationsAssembly("SmartStore.Infra")));
+                      
+            services.AddCors(options =>
             {
-                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                        .AllowAnyMethod()
+                        .AllowCredentials()
+                        .SetIsOriginAllowed((host) => true)
+                        .AllowAnyHeader());
             });
 
+            services.AddSignalR();
             services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
             services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
             services.AddScoped<IPedidoRepositorio, PedidoRepositorio>();
@@ -61,12 +58,7 @@ namespace SmartStore.WebApi
             {
                 x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Smart Store", Version = "v1" });
             });
-
-            // In production, the Angular files will be served from this directory
-            //services.AddSpaStaticFiles(configuration =>
-            //{
-            //    configuration.RootPath = "ClientApp/dist";
-            //});
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -82,32 +74,21 @@ namespace SmartStore.WebApi
                 app.UseHsts();
             }
 
+            app.UseCors("CorsPolicy");
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<NotificationHub>("/notificacao");
+            });
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseSwagger();
             app.UseSwaggerUI(x =>
             {
                 x.SwaggerEndpoint("/swagger/v1/swagger.json", "Smart Store V1");
-            });
-
-            app.UseCors("AllowOrigin");
+            });            
             app.UseMvc();
-
-            //app.UseSpaStaticFiles(); 
-            //app.UseSpa(spa =>
-            //{
-            //    // To learn more about options for serving an Angular SPA from ASP.NET Core,
-            //    // see https://go.microsoft.com/fwlink/?linkid=864501
-
-            //    spa.Options.SourcePath = "ClientApp";
-
-            //    if (env.IsDevelopment())
-            //    {
-            //        // spa.UseAngularCliServer(npmScript: "start");                    
-            //        spa.UseProxyToSpaDevelopmentServer("http://localhost:4200/");
-            //    }
-            //});
+            
         }
     }
 }
