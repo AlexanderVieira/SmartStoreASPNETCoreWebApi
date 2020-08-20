@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using SmartStore.Domain.Entities;
 using SmartStore.Domain.Intefaces;
+using SmartStore.WebApi.Models;
 using SmartStore.WebApi.Services;
 
 namespace SmartStore.WebApi.Controllers
@@ -42,19 +43,35 @@ namespace SmartStore.WebApi.Controllers
             return Ok();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Notifications([FromBody] Produto[] produtos){
+        [HttpPost("enviar")]
+        public async Task<IActionResult> Notifications([FromBody] ProdutoViewModel vmProduto){
 
             try
-            {
-                var listaProduto = new List<Produto>();             
-                for (int i = 0; i < produtos.Length; i++)
-                {                    
-                    var produtoRecuperado = _produtoRepositorio.ObterPorTagId(produtos[i].TagRFID);
-                    listaProduto.Add(produtoRecuperado);                    
+            {                
+                var produtoRecuperado = new Produto();
+                Dictionary<string, PedidoViewModel> carrinho = new Dictionary<string, PedidoViewModel>();
+
+                var listaProduto = new List<Produto>();
+                for (int i = 0; i < vmProduto.ArrayTagProdutoId.Length; i++)
+                {
+                    produtoRecuperado = _produtoRepositorio.ObterPorTagId(vmProduto.ArrayTagProdutoId[i]);
+                    if (produtoRecuperado != null)
+                    {
+                        listaProduto.Add(produtoRecuperado);
+                    }
+                    
                 }
-                
-                await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync("notificationStartedChanged", listaProduto.ToArray());
+
+                var vmPedido = new PedidoViewModel
+                {
+                    CarrinhoId = vmProduto.CarrinhoId,
+                    Usuario = new Usuario { Id = 1, Nome = "Alexander", SobreNome = "Silva" },
+                    Produtos = listaProduto.ToArray()
+                };
+
+                carrinho.Add(vmProduto.CarrinhoId, vmPedido);
+
+                await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync("notificationStartedChanged", carrinho);
 
             }
             catch (Exception ex)
