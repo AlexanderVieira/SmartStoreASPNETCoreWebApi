@@ -24,6 +24,7 @@ namespace SmartStore.WebApi.Controllers
         private const string NOTIFICATION_STARTED_CHANGED = "notificationStartedChanged";
         private const string NOTIFICATION_ENDED = "notificationEnded";
         private const string NOTIFICATION_STARTED = "notificationStarted";
+        private const string NOTIFICATION_POST_STARTED = "notificationPostStarted";
 
         public NotificacaoController(IHubContext<NotificationHub> hubContext, IProdutoRepositorio produtoRepositorio, IUsuarioRepositorio usuarioRepositorio)
         {
@@ -79,7 +80,7 @@ namespace SmartStore.WebApi.Controllers
                     };
 
                     carrinho.Add(vmProduto.CarrinhoId, vmPedido);
-                    await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync(NOTIFICATION_STARTED_CHANGED, carrinho);
+                    await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync(NOTIFICATION_POST_STARTED, carrinho);
                 }
                 else
                 {
