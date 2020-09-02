@@ -19,26 +19,32 @@ namespace SmartStore.WebApi.Controllers
     {
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly IProdutoRepositorio _produtoRepositorio;
+        private readonly IUsuarioRepositorio _usuarioRepositorio;
+        private const string USUARIO_NULO = "Usuário não encontrado.";
+        private const string NOTIFICATION_STARTED_CHANGED = "notificationStartedChanged";
+        private const string NOTIFICATION_ENDED = "notificationEnded";
+        private const string NOTIFICATION_STARTED = "notificationStarted";
 
-        public NotificacaoController(IHubContext<NotificationHub> hubContext, IProdutoRepositorio produtoRepositorio)
+        public NotificacaoController(IHubContext<NotificationHub> hubContext, IProdutoRepositorio produtoRepositorio, IUsuarioRepositorio usuarioRepositorio)
         {
             _hubContext = hubContext;
             _produtoRepositorio = produtoRepositorio;
+            _usuarioRepositorio = usuarioRepositorio;
         }
 
         [HttpGet]
         public async Task<IActionResult> Notifications()
         {
-            await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync("notificationStarted");
+            await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync(NOTIFICATION_STARTED);
 
             for (int i = 0; i < 10; i++)
             {
                 Thread.Sleep(200);
                 Debug.WriteLine($"notification ={ i + 1 }");
-                await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync("notificationStartedChanged", i + 1);
+                await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync(NOTIFICATION_STARTED_CHANGED, i + 1);
             }
 
-            await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync("notificationEnded");
+            await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync(NOTIFICATION_ENDED);
 
             return Ok();
         }
@@ -48,13 +54,13 @@ namespace SmartStore.WebApi.Controllers
 
             try
             {                
-                var produtoRecuperado = new Produto();
+                //var produtoRecuperado = new Produto();
                 Dictionary<string, PedidoViewModel> carrinho = new Dictionary<string, PedidoViewModel>();
 
                 var listaProduto = new List<Produto>();
                 for (int i = 0; i < vmProduto.ArrayTagProdutoId.Length; i++)
                 {
-                    produtoRecuperado = _produtoRepositorio.ObterPorTagId(vmProduto.ArrayTagProdutoId[i]);
+                    var produtoRecuperado = _produtoRepositorio.ObterPorTagId(vmProduto.ArrayTagProdutoId[i]);
                     if (produtoRecuperado != null)
                     {
                         listaProduto.Add(produtoRecuperado);
@@ -62,17 +68,24 @@ namespace SmartStore.WebApi.Controllers
                     
                 }
 
-                var vmPedido = new PedidoViewModel
+                var usuarioRecuperado = _usuarioRepositorio.ObterPorTagId(vmProduto.TagClienteId);
+                if (usuarioRecuperado != null)
                 {
-                    CarrinhoId = vmProduto.CarrinhoId,
-                    Usuario = new Usuario { Id = 1, Nome = "Alexander", SobreNome = "Silva" },
-                    Produtos = listaProduto.ToArray()
-                };
+                    var vmPedido = new PedidoViewModel
+                    {
+                        CarrinhoId = vmProduto.CarrinhoId,
+                        Usuario = usuarioRecuperado,
+                        Produtos = listaProduto.ToArray()
+                    };
 
-                carrinho.Add(vmProduto.CarrinhoId, vmPedido);
-
-                await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync("notificationStartedChanged", carrinho);
-
+                    carrinho.Add(vmProduto.CarrinhoId, vmPedido);
+                    await _hubContext.Clients.Group(NotificationHub.GROUP_NAME).SendAsync(NOTIFICATION_STARTED_CHANGED, carrinho);
+                }
+                else
+                {
+                    return BadRequest(USUARIO_NULO);
+                }
+                
             }
             catch (Exception ex)
             {

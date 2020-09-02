@@ -1,7 +1,4 @@
 ﻿using SmartStore.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SmartStore.Domain.Intefaces
 {
@@ -9,5 +6,6 @@ namespace SmartStore.Domain.Intefaces
     {
         Usuario Obter(string email, string senha);
         Usuario Obter(string email);
+        Usuario ObterPorTagId(string tag);
     }
 }

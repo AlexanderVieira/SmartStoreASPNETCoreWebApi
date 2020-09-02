@@ -20,5 +20,10 @@ namespace SmartStore.Infra.Repositories
         {
             return _ctx.Usuarios.FirstOrDefault(u => u.Email == email);
         }
+
+        public Usuario ObterPorTagId(string tag)
+        {
+            return _ctx.Usuarios.FirstOrDefault(u => u.TagClient == tag);
+        }
     }
 }

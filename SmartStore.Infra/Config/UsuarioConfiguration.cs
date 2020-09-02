@@ -12,6 +12,11 @@ namespace SmartStore.Infra.Config
 
             //Buider utiliza o padrão Fluent
             builder
+                .Property(u => u.TagClient)
+                .IsRequired()
+                .HasMaxLength(10);
+
+            builder
                 .Property(u => u.Email)
                 .IsRequired()
                 .HasMaxLength(50);
