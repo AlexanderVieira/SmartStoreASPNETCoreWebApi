@@ -10,3 +10,6 @@ Integração com Sistema Digital Embarcado:
 - Migration (MySql);
 - Swagger;
 - SignalR;
+
+LINK VÍDEO DEMONSTRAÇÃO PROTÓTIPO
+https://drive.google.com/file/d/1eeWitUN6KtivYk_2z2Dn-oO7wkIeYIjJ/view?usp=sharing
